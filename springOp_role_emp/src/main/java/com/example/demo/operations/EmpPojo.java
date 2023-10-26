@@ -12,6 +12,23 @@ public class EmpPojo {
 	//project  part 2
 	String project_desc,start_date, end_date,project_name, no_of_emp, project_manager_user_name, human_resource_user_name,projectid,emp_id;
 		
+	// project part 3 
+	String old_project_name,new_project_name; 
+	
+	public String getOld_project_name() {
+		return old_project_name;
+	}
+	public void setOld_project_name(String old_project_name) {
+		this.old_project_name = old_project_name;
+	}
+	public String getNew_project_name() {
+		return new_project_name;
+	}
+	public void setNew_project_name(String new_project_name) {
+		this.new_project_name = new_project_name;
+	}
+	
+	///---------------------------
 	public String getEmp_id() {
 		return emp_id;
 	}

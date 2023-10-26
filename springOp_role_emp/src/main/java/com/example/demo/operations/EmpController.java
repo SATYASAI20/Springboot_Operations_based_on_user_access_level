@@ -17,6 +17,10 @@ public class EmpController {
 	@Autowired
 	ProjectEmpDetails_Service project_emp_details;
 	
+	@Autowired
+	New_Project newproject;
+	
+	
 	@PostMapping("insert")
 	String insertOp(@RequestBody EmpPojo pojo_obj){
 		
@@ -35,5 +39,20 @@ public class EmpController {
 	String insertProjectEmpDetails(@RequestBody EmpPojo pojo_obj) {
 		return project_emp_details.emp_details(pojo_obj);
 	}
+	
+	
+	
+	@PostMapping("new_project")
+	String copyProjectDetails(@RequestBody EmpPojo pojo_obj) {
+		return newproject.newprojectOp(pojo_obj);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
