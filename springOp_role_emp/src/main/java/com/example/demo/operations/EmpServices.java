@@ -25,6 +25,8 @@ public class EmpServices {
 	String insert(EmpPojo pojo_obj){
 		String loginuser_name = pojo_obj.getLogin_user_name();
 		String login_user_pass = pojo_obj.getLogin_pass();
+		String role_id_match="";
+		String role_id_status="";
 //		int result=0;
 //		String sql_role = "select * from roles where role_Id = ? and role_Id = H or role_Id = A ";
 	
@@ -64,9 +66,9 @@ public class EmpServices {
 						 
 						 for(int i=0;i<dob.length;i++) {
 							 
-							 if(i==2 || i==3) {
+							 if(i==0 || i==1) {
 								 user_dateOfBirth_D += Character.toString(dob[i]);
-							 }else if(i==5 || i==6) {
+							 }else if(i==3 || i==4) {
 								 user_dateOfBirth_M+=Character.toString(dob[i]);
 							 }else if(i==8 || i==9) {
 								 user_dateOfBirth_Y+=Character.toString(dob[i]);
@@ -83,52 +85,97 @@ public class EmpServices {
 						 String gen_user_password = fname.substring(0, 1).toUpperCase()+lname.substring(0,3)+"@"+time_pass;
 						// user_password creation end
 						 
+						//start date
+							String start_date = "";
+							if( pojo_obj.getDateOfBirth().length()==10) {
+								start_date =  pojo_obj.getDateOfBirth();
+							}else {
+								result = "please enter date in dd/mm/yyyy or dd-mm-yyyy";
+								break;
+							}
+							
+							//end date
+							String join_date = "";
+							if(pojo_obj.getJoin_date().length()==10) {
+								start_date = pojo_obj.getJoin_date();
+							}else {
+								result = "please enter date in dd/mm/yyyy or dd-mm-yyyy";
+								break;
+							}
+						 
 						String sql_roles_table = "select * from roles ";
 						List<Map<String, Object>> al_roles = Jtemp.queryForList(sql_roles_table);
+						System.out.println("entere. al roles");
 						for(Map roles_object : al_roles) {
-							
+							System.out.println(roles_object.get("role")+"entere. al "+pojo_obj.getRole());
 							if(roles_object.get("role").equals(pojo_obj.getRole())) {
-								String role_id_match = (String) roles_object.get("role_Id");
-								List isel_data = new ArrayList<>();
-								
-								 SqlParameterSource p = new MapSqlParameterSource()
-										 	.addValue("id",pojo_obj.getId())
-										 	.addValue("user_name", gen_user_name) //generate
-											.addValue("user_pass", gen_user_password)  //generate
-											.addValue("salary", pojo_obj.getSalary())
-											.addValue("phone_no", pojo_obj.getPhone_no())
-											.addValue("role",role_id_match)
-											.addValue("fname", pojo_obj.getFname())
-											.addValue("lname", pojo_obj.getLname())
-											.addValue("dateOfBirth", pojo_obj.getDateOfBirth())
-											.addValue("email", generated_email); //generate 
-									
-								 
-								 
-								 String insert_data = "insert into employee values(:id,:user_name,:user_pass,:phone_no,:salary,:role,:fname,:lname,:dateOfBirth,:email)";	
-								 System.out.println(".. hello");
-								 
-								try {
-									int update_results = jnamedtemp.update(insert_data,p);
-									System.out.println("jedsasdf");
-									if(update_results != 0) {
-										result = "success";
-									}
-								}catch(Exception e) {
-									result = e+"check sql error";
-								}
-								break;
-//										result = "Successfully inserted the data";
-							}else {
-								result = "invalid role please check details";
+								role_id_match = (String) roles_object.get("role_Id");
+								System.out.println("entere. role id match");
 							}
+//							else {
+//								result = "invalid role please check details";
+//								break;
+//							}
+							
+							if(roles_object.get("role").equals(pojo_obj.getEmp_status())) {
+								role_id_status = (String)roles_object.get("role_Id");
+								System.out.println("entere. role status"+role_id_status);
+									
+								List isel_data = new ArrayList<>();
+									
+									 SqlParameterSource p = new MapSqlParameterSource()
+											 	.addValue("id",pojo_obj.getId())
+											 	.addValue("user_name", gen_user_name) //generate
+												.addValue("user_pass", gen_user_password)  //generate
+												.addValue("salary", pojo_obj.getSalary())
+												.addValue("phone_no", pojo_obj.getPhone_no())
+												.addValue("role",role_id_match)
+												.addValue("fname", pojo_obj.getFname())
+												.addValue("lname", pojo_obj.getLname())
+												.addValue("dateOfBirth",start_date)
+												.addValue("email", generated_email) //generate 
+												.addValue("join_date", join_date)
+												.addValue("emp_status", role_id_status);
+									 
+									 
+									 String insert_data = "insert into employee values(:id,:user_name,:user_pass,:phone_no,:salary,:role,:fname,:lname,:dateOfBirth,:email, :join_date,:emp_status)";	
+									 System.out.println(".. hello");
+									 
+									try {
+										int update_results = jnamedtemp.update(insert_data,p);
+										System.out.println("jedsasdf");
+										if(update_results != 0) {
+											result = "Successfully inserted the data";
+											break;
+										}
+									}catch(Exception e) {
+										result = "Duplicate entry, your details id and user name";
+										break;
+									}
+//									break;
+//									result = "Successfully inserted the data";
+							}
+//							else {
+//								result = "invalid status please check employee status";
+//								break;
+//							}
+							
+						}
+						if(role_id_match == "") {
+							result = "invalid role please check details role should be "
+									+ "Project Manager or Admin or Human Resource or Team Lead or Employee";
+						}
+						if(role_id_status =="") {
+							result = "invalid status please check employee status";
 						}
 				}else {
 					result = "only hr or Admin can insert data";
+					break;
 				}
 			}
 		}else {
 			result="please enter a user name or password";
+			
 		}
 		return result;
 	}

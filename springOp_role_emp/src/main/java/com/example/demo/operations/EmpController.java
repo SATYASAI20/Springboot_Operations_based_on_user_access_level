@@ -11,13 +11,29 @@ public class EmpController {
 	@Autowired
 	EmpServices service_obj;
 	
+	@Autowired
+	ProjectDetailsService project_details_obj;
+	
+	@Autowired
+	ProjectEmpDetails_Service project_emp_details;
+	
 	@PostMapping("insert")
 	String insertOp(@RequestBody EmpPojo pojo_obj){
 		
 		return service_obj.insert(pojo_obj);
 		
-		
-		
 	}
+	
+	
+	@PostMapping("project_details_insert")
+	String insertProjectDetails(@RequestBody EmpPojo pojo_obj) {
+		return project_details_obj.project_details(pojo_obj);
+	}
+	
+	
+	@PostMapping("project_emp_insert")
+	String insertProjectEmpDetails(@RequestBody EmpPojo pojo_obj) {
+		return project_emp_details.emp_details(pojo_obj);
+	}
+	
 }
-//return "please check your login details";
