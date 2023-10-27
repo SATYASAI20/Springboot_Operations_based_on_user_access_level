@@ -185,8 +185,7 @@
 ////	}
 ////}
 //// -------------------------------------------------------------------------------------------------------
-//// table projectempdetails
-// package com.example.demo.operations;
+//package com.example.demo.operations;
 //
 //import java.util.List;
 //import java.util.Map;
@@ -209,11 +208,13 @@
 //	
 //	String emp_details(EmpPojo empObj){
 //		System.out.println("enterd method");
+//		boolean login_user = false, login_pass=false, login_condition_project_manager=false;
 //		String result = "";
-//		String current_login_user = empObj.getLogin_user_name();
-//		String current_login_pass = empObj.getLogin_pass();
+//		String current_login_user = ""; 								//empObj.getLogin_user_name();
+//		String current_login_pass = "";										//empObj.getLogin_pass();
 //		String role_p = "P";
 //		int id;
+////		boolean pm=false, projectid=false;
 //		String project_details = "select * from projectDetails "; 
 //		List<Map<String, Object>> project_details_table = jtemp.queryForList(project_details);
 //		System.out.println("query executed");
@@ -231,7 +232,7 @@
 //				String projectid = empObj.getProjectid();
 //				System.out.println(projectid+" satya hello");
 //				//project manager
-//				String project_manager = empObj.getProject_manager_user_name();
+//				String project_manager = "";			//empObj.getProject_manager_user_name();
 //				//project start date
 //				String project_start_date = (String)project_details_obj.get("start_date");
 //				//project_manager_user_name
@@ -246,10 +247,22 @@
 //				
 //				for(Map emp_table_obj : emp_table) {
 //					
-//					if((emp_table_obj.get("user_name").equals(current_login_user)) 
-//							&& (emp_table_obj.get("user_pass").equals(current_login_pass))
-//							&& (emp_table_obj.get("user_name").equals(project_manager))) {
+//					if(emp_table_obj.get("user_name").equals(empObj.getLogin_user_name())) {
+//						login_user = true;
+//						current_login_user = empObj.getLogin_user_name();
+//					}
+//					if (emp_table_obj.get("user_pass").equals(empObj.getLogin_pass())) {
+//						login_pass = true;
+//						current_login_pass = empObj.getLogin_pass();
+//					}
+//					if (emp_table_obj.get("user_name").equals(empObj.getProject_manager_user_name())) {
+//						login_condition_project_manager = true;
+//						project_manager = empObj.getProject_manager_user_name();
 //						
+//					}
+//					
+//					if(login_user == true && login_pass == true && login_condition_project_manager== true) {	
+//						//----changed 
 //						System.out.println("query executed ..."+emp_table_obj.get("id")+" "+(empObj.getEmp_id()));
 //						
 //						//employee table
@@ -261,7 +274,7 @@
 //					
 //						for(Map  for_pro_emp_sql_obj: for_pro_emp_sql_table) {
 //							 id =(int) for_pro_emp_sql_obj.get("id");
-////							 System.out.println("condition satisified----- !!!");
+//							 System.out.println("condition satisified----- !!!");
 ////							System.out.println(for_pro_emp_sql_obj.get("id")+" "+((String)empObj.getEmp_id()));
 //							if(empObj.getEmp_id().equals(String.valueOf(id))) {
 //								System.out.println("condition satisified !!!");
@@ -299,43 +312,54 @@
 //										+ ":project_manager_user_name"
 //										+ ")";
 ////								System.out.println("enter project emp details sql");
-//							
-//									int success = jnamed_temp.update(project_emp_details,param);
-//									System.out.println("success project_emp_details !!!"+success);
-//									if(success != 0) {
-//										
-//										String update_status = "update employee set emp_status='A' where id=?";
-//										int updated_status = jtemp.update(update_status,emp_id);
-//										
-//										if(updated_status != 0) { 
-//											result = " Employee successfully inserted into project";
-//											break;
-//										}else {
-//											result = "failed to update Employee into project";
-//											break;
+//										try {
+//											int success = jnamed_temp.update(project_emp_details,param);
+//											System.out.println("success project_emp_details !!!"+success);
+//											
+//											if(success != 0) {
+//												try {
+//													String update_status = "update employee set emp_status='A' where id=?";
+//													int updated_status = jtemp.update(update_status,emp_id);
+//											
+//													if(updated_status != 0) { 
+//														result = " Employee successfully inserted into project";
+//														break;
+//													}
+//												}catch(Exception e) {
+//													result="duplicate entry, please check";
+//												}	
+//											}else {
+//												result = "failed to insert data ";
+//											}
+//										}catch(Exception e) {
+//											result = "failed to insert data, duplicate entry "; //please check employee id, "project name and phone number";
 //										}
-//									}else {
-//										result = "failed to insert data ";
-//									}
-////								}catch(Exception e) {
-////									result = "failed to insert data, duplicate entry please check employee id, "
-////											+ "project name and phone number";
-////								}
-//								
+//								break; //-----
 //							}else {
 //								result = "duplicate employee id, check your employee id";
 //							}
+//							
 //						}
-//					}else {
-//						result = "invalid user name or password or project manager user name, please check";
+//						break;
 //					}
+////					else {  ///--------------
+////						result = "invalid user name or password or project manager user name, please check";
+////					}
 //				}
-//				
+//				if(current_login_user=="") {
+//					result = "invalid user name, please check your user name";
+//					break;
+//				}
+//				if(current_login_pass == "") {
+//					result = "invalid PASSWORD, please check your PASSWORD";
+//					break;
+//				}
+//				if(project_manager == "") {
+//					result = "invalid project manager USER NAME, please check project manager user name";
+//					break;
+//				}
 //			}
-////			else {
-////				result = "Invalid project manager or project id or already exits";
-////				break;
-////			}
+//			
 //			
 //		}
 //		

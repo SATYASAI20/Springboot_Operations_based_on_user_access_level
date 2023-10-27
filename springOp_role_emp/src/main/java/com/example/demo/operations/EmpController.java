@@ -29,6 +29,9 @@ public class EmpController {
 	}
 	
 	
+	
+	
+	
 	@PostMapping("project_details_insert")
 	String insertProjectDetails(@RequestBody EmpPojo pojo_obj) {
 		return project_details_obj.project_details(pojo_obj);
