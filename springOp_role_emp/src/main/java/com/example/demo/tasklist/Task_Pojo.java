@@ -3,14 +3,22 @@ package com.example.demo.tasklist;
 public class Task_Pojo {
 	String  task_name, description, duration,projectid;
 	
-	String taskid, taskrole;
+	String taskid, taskstatus; //, taskrole
 	
-	public String getTaskrole() {
-		return taskrole;
+//	public String getTaskrole() {
+//		return taskrole;
+//	}
+//
+//	public void setTaskrole(String taskrole) {
+//		this.taskrole = taskrole;
+//	}
+
+	public String getTaskstatus() {
+		return taskstatus;
 	}
 
-	public void setTaskrole(String taskrole) {
-		this.taskrole = taskrole;
+	public void setTaskstatus(String taskstatus) {
+		this.taskstatus = taskstatus;
 	}
 
 	public String getTaskid() {
