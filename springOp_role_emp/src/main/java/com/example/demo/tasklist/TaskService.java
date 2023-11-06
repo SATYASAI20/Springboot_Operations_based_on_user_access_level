@@ -22,7 +22,7 @@ public class TaskService {
 	@Autowired
 	NamedParameterJdbcTemplate jnamedtemp;
 	
-	public String tasklist(Task_Pojo taskpojo) {
+	public String tasklist_insert(Task_Pojo taskpojo) {
 		
 		boolean login_user = false, login_pass=false, login_condition_project_manager=false;
 		String current_login_user = ""; 								
@@ -305,7 +305,7 @@ public class TaskService {
 
 	public List tasklist_select(Task_Pojo taskpojo) {
 		
-		String valiations = login_valiation(taskpojo);
+		String valiations = login_validation(taskpojo);
 		List arraylist = new ArrayList<Object>();
 		String role_id="";
 		//successfully logged in 
@@ -363,12 +363,12 @@ public class TaskService {
 					arraylist.add(tasklist_table_data);	
 				}
 			}else {
-				System.out.println(arraylist+"  empty122");
+//				System.out.println(arraylist+"  empty122");
 				// no id or status is given --------- or empty is given
 				List<Map<String, Object>> no_id_or_status = jtemp.queryForList(sql_select_tasklist);
 				
 				arraylist.add(no_id_or_status);
-				System.out.println(arraylist+"  empty");
+//				System.out.println(arraylist+"  empty");
 				
 			}
 		}else {
@@ -380,7 +380,7 @@ public class TaskService {
 		return arraylist;
 	}
 	
-	public String login_valiation(Task_Pojo taskpojo){
+	public String login_validation(Task_Pojo taskpojo){
 		boolean login_user = false, login_pass=false, login_condition_project_manager=false;
 		String current_login_user = ""; 								
 		String current_login_pass = "";										

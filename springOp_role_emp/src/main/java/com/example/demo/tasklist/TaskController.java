@@ -14,9 +14,9 @@ public class TaskController {
 	TaskService taskserviceobj;
 	
 	@PostMapping("tasklist_insert")
-	String tasklist(@RequestBody Task_Pojo taskpojo) {
+	String tasklist_insert(@RequestBody Task_Pojo taskpojo) {
 		
-		return taskserviceobj.tasklist(taskpojo);
+		return taskserviceobj.tasklist_insert(taskpojo);
 	}
 	
 	
