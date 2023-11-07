@@ -15,8 +15,9 @@ public class Emptasklist_Controller {
 	
 	//API call for completed task and employee taskList
 	@PostMapping("competed_tasklist_emp_task")
-	String emptasklist_completed(Emptask_Pojo Emptask_pojo_obj) {
+	String tasklist_completed(@RequestBody Emptask_Pojo Emptask_pojo_obj) {
 		System.out.println(121);
+		System.out.println(Emptask_pojo_obj.getLogin_user_name());
 			return emptasklistService_obj.emptasklist_completed(Emptask_pojo_obj);
 	}
 	

@@ -35,26 +35,28 @@ public class Emptasklist_Service {
 		boolean Emp_tasklist = false;
 		System.out.println(111+" ---"+validate.equals("true")+"---"+validate);
 		if(validate.equals("true") == true) {
-			System.out.println(1133100);
+//			System.out.println(1133100);
 			if(Emptask_pojo_obj.getEmp_task_id() != ""){
-				System.out.println(11331);
+//				System.out.println(11331);
 				String sql = "select * from Emp_tasklist where task_id=?";
 				
 				List<Map<String, Object>>sql_emp_tasklist_table=jtemp.queryForList(sql,Emptask_pojo_obj.getEmp_task_id());
 				for(Map sql_emp_tasklist_obj : sql_emp_tasklist_table) {
 					if(sql_emp_tasklist_obj.get("task_id").equals(Emptask_pojo_obj.getEmp_task_id())) {
 						Emp_tasklist = true;
-						System.out.println(111);
+						System.out.println(111+"true");
 					}
 				}
 				if(Emp_tasklist == true) {
 					System.out.println("entered");
-					String sql_Emp_tasklist_update_status = "update table Emp_tasklist set emp_tasklist_status = F where task_id = ?";
+					String sql_Emp_tasklist_update_status = "update Emp_tasklist set emp_tasklist_status = 'F' where task_id = ? ";
 					int result_Emp_tasklist_status = jtemp.update(sql_Emp_tasklist_update_status, Emptask_pojo_obj.getEmp_task_id());
-					System.out.println("entered"+result_Emp_tasklist_status);
-					String sql_task_update_status = "update table tasklist set task_status = F where taskid = ?";
+//					
+					System.out.println("entered----->"+result_Emp_tasklist_status);
+					String sql_task_update_status = "update tasklist set task_status = 'F' where taskid = ? ";
 					int result_task_status = jtemp.update(sql_task_update_status, Emptask_pojo_obj.getEmp_task_id());
-					System.out.println("entered1   "+sql_task_update_status);
+					System.out.println("entered1 ----->  "+sql_task_update_status);
+					
 					if(result_task_status != 0 && result_Emp_tasklist_status != 0 ) {
 						result = "Project Successfully completed...!";
 					}else {
@@ -78,6 +80,7 @@ public class Emptasklist_Service {
 		List arraylist = new ArrayList<Object>();
 		String role_id="";
 		String employee = "employee";
+		
 		//successfully logged in 
 		if(valiations.equals("true")) {
 			
@@ -284,12 +287,12 @@ public class Emptasklist_Service {
 		String current_login_user = ""; 								
 		String current_login_pass = "";										
 		String role_p = "P";
-		String project_manager_username = "";
+//		String project_manager_username = "";
 //		String task_id = "";
 		String result="";
-		System.out.println("hello -->"+ Emptask_pojo_obj.getLogin_user_name());
+//		System.out.println("hello -->"+ Emptask_pojo_obj.getLogin_user_name());
 		/*
-		if(Emptask_pojo_obj.getEmp_task_id() != null ) {
+		aif(Emptask_pojo_obj.getEmp_task_id() != null ) {
 				System.out.println(project_manager_username+"jel entered");
 				
 				try {
