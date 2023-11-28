@@ -140,7 +140,7 @@ public class GMailer {
 	}
 	
 	public static void main(String args[]) throws Exception{
-		new GMailer().SendMail("Meating for ITG-164 by Saradhi Sir", 
+		new GMailer().SendMail("Meating ", 
 				"""
 				Hello Good afternoon.
 				
