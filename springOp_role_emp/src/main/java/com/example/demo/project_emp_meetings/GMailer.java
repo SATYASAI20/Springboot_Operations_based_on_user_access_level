@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -14,10 +16,13 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.catalina.Service;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapProperties.Credential;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -36,11 +41,14 @@ import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.Message;
 
 
-
-
+@org.springframework.stereotype.Service
 public class GMailer {
-	 private static final String from_user_email_test = "xxxxxx@gmail.com";
-	 private static final String to_user_email_test = "xxxxxx@gmail.com";
+	
+	@Autowired
+	JdbcTemplate jtemp;
+	
+	 private static final String from_user_email_test = "xxxxxxxxx@gmail.com";
+//	 private static final String to_user_email_test = "xxxxxxxxx@gmail.com";
 	 private static Gmail service;
 	
 	
@@ -83,71 +91,79 @@ public class GMailer {
 	}
 
 	
-	public void SendMail(String subject, String message) throws Exception{
-	
+	public void SendMail(String subject, String message, String employee_content_ids) throws Exception{
+		System.out.println("entered--- je");
+		getCredentials(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance());
+		System.out.println(employee_content_ids+"??????????");
+		
 	    // Create the email content
-//	    String messageSubject = "Test message";
-//	    String bodyText = "lorem ipsum.";
+		// employee id's of there respective team only
+		String[] employee_content_id=employee_content_ids.split(" ");
+		
+		for(String id:employee_content_id) {
+			String employee_content_ids_sql = "select * from employee where id=?";
+			List<Map<String,Object>>list =jtemp.queryForList(employee_content_ids_sql,id);
+			//getting the email of the respective employee based on employee id
+			for(Map list_obj : list) {
+				// sending the email to each employee 
+				String emp_email_id = (String)list_obj.get("email");
+				
+				
+				 // Encode as MIME message
+			    Properties props = new Properties();
+			    Session session = Session.getDefaultInstance(props, null);
+			    MimeMessage email = new MimeMessage(session);
+			    // from email address
+			    email.setFrom(new InternetAddress(from_user_email_test));
+			    // to-email address
+			    email.addRecipient(javax.mail.Message.RecipientType.TO,
+			    		new InternetAddress(emp_email_id));  
+			    // email subject
+			    email.setSubject(subject);
+			    // email body
+			    email.setText(message);
+			    
+			    
 
-	    // Encode as MIME message
-	    Properties props = new Properties();
-	    Session session = Session.getDefaultInstance(props, null);
-	    MimeMessage email = new MimeMessage(session);
-	    email.setFrom(new InternetAddress(from_user_email_test));
-	    email.addRecipient(javax.mail.Message.RecipientType.TO,
-	    		new InternetAddress(to_user_email_test));   // to-email address
-	    email.setSubject(subject);
-	    email.setText(message);
-	    
-	    
-//	    MimeBodyPart mimeBodyPart = new MimeBodyPart();
-//	    mimeBodyPart.setContent(bodyText, "text/plain");
-//	    Multipart multipart = new MimeMultipart();
-//	    multipart.addBodyPart(mimeBodyPart);
-//	    mimeBodyPart = new MimeBodyPart();
-//	    DataSource source = new FileDataSource(file);
-//	    mimeBodyPart.setDataHandler(new DataHandler(source));
-//	    mimeBodyPart.setFileName(file.getName());
-//	    multipart.addBodyPart(mimeBodyPart);
-//	    email.setContent(multipart);
+			    // Encode and wrap the MIME message into a gmail message
+			    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			    email.writeTo(buffer);
+			    byte[] rawMessageBytes = buffer.toByteArray();
+				String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
+			    Message msg = new Message();
+			    msg.setRaw(encodedEmail);
+			    
+			    try {
+			    System.out.println("entered");
+			      msg = ((Gmail) service).users().messages().send("me",msg).execute();
+			      System.out.println("entered exit");
+			      System.out.println("Draft id: " + msg.getId());	
+			      System.out.println(msg.toPrettyString());
+//			      return draft;
+			    } catch (GoogleJsonResponseException e) {
+			      // TODO(developer) - handle error appropriately
+			      GoogleJsonError error = e.getDetails();
+			      if (error.getCode() == 403) {
+			        System.err.println("Unable to create draft: " + e.getDetails());
+			      } else {
+			        throw e;
+			      }
+			    }
 
-	    // Encode and wrap the MIME message into a gmail message
-	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	    email.writeTo(buffer);
-	    byte[] rawMessageBytes = buffer.toByteArray();
-		String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
-	    Message msg = new Message();
-	    msg.setRaw(encodedEmail);
-	    
-	    try {
-	    System.out.println("entered");
-	      msg = ((Gmail) service).users().messages().send("me",msg).execute();
-	      System.out.println("entered exit");
-	      System.out.println("Draft id: " + msg.getId());	
-	      System.out.println(msg.toPrettyString());
-//	      return draft;
-	    } catch (GoogleJsonResponseException e) {
-	      // TODO(developer) - handle error appropriately
-	      GoogleJsonError error = e.getDetails();
-	      if (error.getCode() == 403) {
-	        System.err.println("Unable to create draft: " + e.getDetails());
-	      } else {
-	        throw e;
-	      }
-	    }
+			}
+		}
 
-	    
 	}
 	
-	public static void main(String args[]) throws Exception{
-		new GMailer().SendMail("Meating", 
-				"""
-				Hello Good afternoon.
-				
-				The following the meeting link for https://link 
-				for session on revise topics of CORE JAVA.
-				
-				Thank You.
-				""");
-	}
+//	public static void main(String args[]) throws Exception{
+//		new GMailer().SendMail("Meating for ITG-164 ", 
+//				"""
+//				Hello Good afternoon.
+//				
+//				The following the meeting link for https://link 
+//				for session on revise topics of CORE JAVA.
+//				
+//				Thank You.
+//				""");
+//	}
 }

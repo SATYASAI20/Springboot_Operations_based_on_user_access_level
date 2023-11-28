@@ -1,7 +1,12 @@
 package com.example.demo.project_emp_meetings;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
+@Getter @Setter
 public class Meetings_Pojo {
 	
 	private String projectid, meeting_name, meeting_content;
@@ -9,8 +14,27 @@ public class Meetings_Pojo {
 	private String login_user_name, login_pass;
 	private int meeting_duration;
 	
+	//gmail api param
+
+	private String subject, message;
 	
 	
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
 	public String getStart_date() {
 		return start_date;
 	}

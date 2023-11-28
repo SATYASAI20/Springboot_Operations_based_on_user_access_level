@@ -27,6 +27,9 @@ public class Project_Emp_Service {
 	JdbcTemplate jtemp;
 	
 	@Autowired
+	GMailer gmailer_Obj;
+	
+	@Autowired
 	NamedParameterJdbcTemplate Jtemp;
 	
 	public String project_emp_meetings(Meetings_Pojo Project_Emp_Pojo) {
@@ -250,6 +253,8 @@ public class Project_Emp_Service {
 							
 							if(insert_success != 0 && meeting_status == true) {
 								result = "successfully created the meeting for employee by USER NAME --->"+validate_status_login_user+" added users -->"+employee_content_ids;
+								//calling the gmail api to send mails to the teammates
+								gmailer_Obj.SendMail(Project_Emp_Pojo.getSubject(), Project_Emp_Pojo.getMessage(),employee_content_ids);
 							}else {
 								result = "meeting is already created by, please check once USER NAME --->"+meeting_created_user;
 							}
@@ -300,7 +305,12 @@ public class Project_Emp_Service {
 							
 							
 							if(insert_success != 0 && meeting_status == true) {
-								result = "successfully created the meeting for employee by USER NAME --->"+validate_status_login_user;
+								System.out.println(";;;;;;;;");
+								//calling the gmail api to send mails to the teammates
+								gmailer_Obj.SendMail(Project_Emp_Pojo.getSubject(), Project_Emp_Pojo.getMessage(),employee_content_ids);
+//								result = "successfully created the meeting for employee by USER NAME --->"+validate_status_login_user;
+								
+								
 							}else {
 								result = "meeting is already created by, please check once USER NAME --->"+meeting_created_user;
 							}
