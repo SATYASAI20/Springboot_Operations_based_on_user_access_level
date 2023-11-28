@@ -175,8 +175,91 @@ public class Project_Emp_Service {
 						hr = (String)sql_project_details_table_obj.get("HR");
 						System.out.println(project_manager+"-->"+hr+"--->"+validate_status_login_user+"--->"+validate_status_login_user_role);
 					}
-					
+					// only other employees can invited to meeting whose role is employee
 					if(validate_status_login_user_role.equals("E")) {
+						String sql_pro_emp_details = "select * from projectEmp_Details where project_id = ? ";
+						List<Map<String,Object>> sql_pro_emp_details_table = jtemp.queryForList(sql_pro_emp_details, Project_Emp_Pojo.getProjectid());
+						for(Map sql_pro_emp_details_table_obj : sql_pro_emp_details_table) {
+							String emp_id_exits = (String)sql_pro_emp_details_table_obj.get("emp_id");
+							// meeting employee not id's given
+							if(Project_Emp_Pojo.getMeeting_content()==null) {
+								// checks employee role is employee(E) or not if role is 'E' then add to string, if not it will skip
+								// so that employee can invite other employees
+								String sql_employee_id = "select * from employee where id=? and role=?";
+								List<Map<String,Object>> sql_employee_id_table_role = jtemp.queryForList(sql_employee_id, emp_id_exits,"E");
+								if(sql_employee_id_table_role.isEmpty()==false) {
+									employee_content_ids += (String)sql_pro_emp_details_table_obj.get("emp_id")+" ";
+								}
+							}else {
+								//meeting id's given
+								if(Project_Emp_Pojo.getMeeting_content()!=null || Project_Emp_Pojo.getMeeting_content()!=" ") {
+									String[] employee_ids = Project_Emp_Pojo.getMeeting_content().split(" ");
+									
+									for(String employee_ids_obj : employee_ids) {
+										if(emp_id_exits.equals((String)employee_ids_obj)) {
+											employee_content_ids += (String)sql_pro_emp_details_table_obj.get("emp_id")+" ";
+										}
+									}
+									
+								}else {
+									result = "enter a valid employee ids, error id : 'pro_emp_service:3' ";
+									break;
+								}
+							}
+							
+						}
+						SqlParameterSource param = new MapSqlParameterSource()
+								.addValue("projectid", Project_Emp_Pojo.getProjectid())
+								.addValue("meeting_id", meeting_id)
+								.addValue("meeting_name", Project_Emp_Pojo.getMeeting_name())
+								.addValue("employee_content_ids", employee_content_ids)
+								.addValue("start_time", Project_Emp_Pojo.getStart_time())
+								.addValue("end_time", end_time)
+								.addValue("meeting_duration", Project_Emp_Pojo.getMeeting_duration())
+								.addValue("meeting_status", "C")
+								.addValue("createdBy", validate_status_login_user)
+								.addValue("meeting_desc", Project_Emp_Pojo.getMeeting_desc())
+								.addValue("start_date", Project_Emp_Pojo.getStart_date())
+								.addValue("end_date", end_date);
+						try {
+							
+							//validating meeting already created or not
+							String sql_meeting_status = "select * from meetings where meeting_name = ? and meeting_status = ?";
+							List<Map<String,Object>> sql_meetings_status_table = jtemp.queryForList(sql_meeting_status, Project_Emp_Pojo.getMeeting_name(), "C");
+							System.out.println(sql_meetings_status_table+"-------");
+							if(!sql_meetings_status_table.isEmpty()) {
+								for(Map sql_meetings_status_table_obj :sql_meetings_status_table) {
+									if(sql_meetings_status_table_obj.get("meeting_status").equals("C")) {
+										meeting_created_user = (String)sql_meetings_status_table_obj.get("createdBy");
+										result = "Meeting is already created by USER NAME -!->"+ meeting_created_user;
+										break;
+										//// some ----------
+									
+									}
+								}
+							}else {
+								meeting_status = true;
+							}
+							
+							//insert data into meetings table 
+							String sql_insert_meetings = "insert into meetings values(:projectid,:meeting_id,"
+									+ ":meeting_name,:employee_content_ids,:start_time,:end_time,:meeting_duration,:meeting_status,"
+									+ ":createdBy,:meeting_desc,:start_date,:end_date)";
+							int insert_success = Jtemp.update(sql_insert_meetings, param);
+							
+							
+							if(insert_success != 0 && meeting_status == true) {
+								result = "successfully created the meeting for employee by USER NAME --->"+validate_status_login_user+" added users -->"+employee_content_ids;
+							}else {
+								result = "meeting is already created by, please check once USER NAME --->"+meeting_created_user;
+							}
+						}catch(Exception e) {
+							result = "sql error id:'pro_emp_service:1'";
+						}
+						
+					}
+					// HR or Project Manager has access to invite all team and HR.
+					else if(validate_status_login_user_role.equals("H") || validate_status_login_user_role.equals("P")){
 						String sql_pro_emp_details = "select * from projectEmp_Details where project_id = ? ";
 						List<Map<String,Object>> sql_pro_emp_details_table = jtemp.queryForList(sql_pro_emp_details, Project_Emp_Pojo.getProjectid());
 						for(Map sql_pro_emp_details_table_obj : sql_pro_emp_details_table) {
@@ -216,17 +299,14 @@ public class Project_Emp_Service {
 							int insert_success = Jtemp.update(sql_insert_meetings, param);
 							
 							
-							if(insert_success != 0 && meeting_status==true) {
+							if(insert_success != 0 && meeting_status == true) {
 								result = "successfully created the meeting for employee by USER NAME --->"+validate_status_login_user;
 							}else {
 								result = "meeting is already created by, please check once USER NAME --->"+meeting_created_user;
 							}
 						}catch(Exception e) {
-							result = "sql error id:'pro_emp_service:1'";
+							result = "sql error id:'pro_emp_service:2'";
 						}
-						
-					}else{
-						
 					}
 					
 				}
